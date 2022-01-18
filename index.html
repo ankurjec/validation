@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Validation</title>
+  <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday@1.8.2/css/pikaday.css">
+  <link rel="stylesheet" media="screen" href="http://www.globalodds.org/file/handsontable/dist/handsontable.css">
+
+  <!-- <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+  
+  <link rel="stylesheet" media="screen" href="http://www.globalodds.org/file/handsontable/dist/handsontable.css">
+  <link rel="stylesheet" media="screen" href="http://www.globalodds.org/file/handsontable/dist/pikaday/pikaday.css">
+  <script src="http://www.globalodds.org/file/handsontable/dist/pikaday/pikaday.js"></script>
+  <script src="http://www.globalodds.org/file/handsontable/dist/moment/moment.js"></script>
+  <script src="http://www.globalodds.org/file/handsontable/dist/zeroclipboard/ZeroClipboard.js"></script>
+  <script src="http://www.globalodds.org/file/handsontable/dist/numbro/numbro.js"></script>
+  <script src="http://www.globalodds.org/file/handsontable/dist/numbro/languages.js"></script>
+  <script src="http://www.globalodds.org/file/handsontable/dist/handsontable.js"></script>
+  <script src="http://www.globalodds.org/file/handsontable/demo/js/samples.js"></script>
+  <script src="http://www.globalodds.org/file/handsontable/demo/js/samples.js"></script>
+  <script src="http://www.globalodds.org/file/handsontable/demo/js/samples.js"></script> -->
+
+  <style>
+	body {
+		padding: 0;
+		margin: 0;
+		background: #ffffff
+	  }
+	  
+	  th,
+	  td {
+		font: 12px sans-serif;
+	  }
+	  
+	  .handsontable th {
+		background: #03A9F4;
+	  }
+	  
+	  .handsontable td.above-fifty {
+		color: #33691E;
+		background: #DCEDC8;
+	  }
+	  
+	  .handsontable td.below-fifty {
+		color: #777777;
+		background: #fefefe;
+	  }</style>
+</head>
+
+<body>
+	
+	<div id="example1" class="hot handsontable htColumnHeaders"></div>
+</body>
+<script>
+	const example = document.getElementById('example1');
+const myData = [
+  ['Allow Value', null, null],
+  [9, 'Between 0-9', null],
+  [25, 'Not between 0-20', null],
+  [21, 'Equal to 20', null],
+  [21, 'Not equal to 20', null],
+  [21, 'Greater than 20', null],
+  [21, 'Less than 20', null],
+  [21, 'Greater or equal to 20', null],
+  ['Allow type', null, null],
+  [20, 'Number', null],
+  [20, 'Text', null],
+  ['George Clooney', 'Text length is less than 20 characters', null],
+  ['Mike Tyson', 'Text is only lowercase', 'Ignore blank spaces'],
+  ['ANTHONY HOPKINS', 'Text is only uppercase', 'Ignore blank spaces'],
+  ['12/02/abc', 'Date', 'Format: MM/DD/YYYY'],
+  ['13:abc', 'Time', 'Format: H:mm'],
+];
+
+const hot = new Handsontable(example, {
+  data: myData,
+  colHeaders: ['Value', 'Criteria', 'Comment'],
+  licenseKey: 'non-commercial-and-evaluation',
+  colWidths: [240, 265, 240],
+  cells: function(row, col){
+  	const cellProperties = {};
+
+    if(row === 0 || row === 8){
+    	cellProperties.className = 'category';
+      cellProperties.readOnly = true;
+    }
+
+    if (col === 0) {
+    	if (row > 0 && row !== 8 && row < 10) {
+        cellProperties.type = 'numeric';
+
+      } else if (row > 10 && row < 14) {
+      	cellProperties.validator = /./g;
+
+      } else if (row === 14) {
+      	cellProperties.type = 'date';
+        cellProperties.dateFormat = 'MM/DD/YYYY';
+
+      } else if (row === 15) {
+      	cellProperties.type= 'time';
+        cellProperties.timeFormat= 'H:mm';
+      }
+
+    } else {
+    	cellProperties.readOnly = true;
+    }
+
+    return cellProperties;
+  },
+  afterValidate: function(isValid, value, row, prop, source) {
+	//can be used for cells that already have an active validator
+    if (this.propToCol(prop) !== 0) {
+    	return;
+    }
+
+    switch(row) {
+    	case 1:
+      	return value <= 9 && value >= 0;
+
+      case 2:
+      	return value > 20 || value < 0;
+
+      case 3:
+      	return value === 20;
+
+      case 4:
+      	return value !== 20;
+
+      case 5:
+      	return value > 20;
+
+      case 6:
+        return value < 20;
+
+      case 7:
+      	return value >= 20;
+
+      case 11:
+        return value.length < 20;
+
+      case 12:
+      	return !(/[A-Z]/g.test(value));
+
+      case 13:
+      	return !(/[a-z]/g.test(value));
+
+      default:
+      	break;
+    }
+  }
+});
+
+
+hot.validateCells();
+</script>
+
+</html>
